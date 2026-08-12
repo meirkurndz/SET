@@ -15,18 +15,18 @@ struct SetGameView: View {
   var body: some View {
     VStack{
       Button("New Game"){
-        viewModel.newGame()
+        viewModel.newGameTaped()
       }
         .font(.largeTitle)
       cards.animation(.default, value: viewModel.cardsOnBoard)
         .padding()
       HStack{
         Button("Deal Cards"){
-          viewModel.deal3MoreCards()
+          viewModel.dealCardsTaped()
         }
         Spacer()
         Button("Shuffle"){
-          viewModel.shuffleCards()
+          viewModel.shuffleTaped()
         }
       }
       .font(.largeTitle)
@@ -40,7 +40,7 @@ struct SetGameView: View {
       CardView(card: card)
         .padding(4)
         .onTapGesture{
-          viewModel.choose(card)
+          viewModel.cardTaped(card)
         }
     }
     .foregroundColor(Color.black)

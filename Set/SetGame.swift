@@ -36,7 +36,7 @@ struct SetGame{
     cardsOnBoard.shuffle()
   }
 
-  mutating func deal3MoreCards(){
+  mutating func dealMoreCards(){
     if(deck.count >= 3){
       for _ in 0..<3 {
         if let card = deck.popLast(){

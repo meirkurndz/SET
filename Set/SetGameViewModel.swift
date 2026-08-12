@@ -12,7 +12,7 @@ class SetGameViewModel: ObservableObject {
 
   @Published private var model: SetGame
   static var Game = SetGameViewModel()
-  
+
   init(){
     model = Self.createSetGame()
   }
@@ -29,20 +29,20 @@ class SetGameViewModel: ObservableObject {
     model.cardsOnBoard
   }
 
-  func newGame(){
+  func newGameTaped(){
     model = Self.createSetGame()
   }
 
-  func choose(_ card: SetGame.Card){
+  func cardTaped(_ card: SetGame.Card){
     model.choose(card)
   }
 
-  func shuffleCards(){
+  func shuffleTaped(){
     model.shuffleCards()
   }
 
-  func deal3MoreCards(){
-    model.deal3MoreCards()
+  func dealCardsTaped(){
+    model.dealMoreCards()
   }
 }
 
