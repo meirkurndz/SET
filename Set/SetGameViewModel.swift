@@ -12,6 +12,7 @@ class SetGameViewModel: ObservableObject {
 
   @Published private var model: SetGame
   static var Game = SetGameViewModel()
+  static let dealDelay = 150
 
   init(){
     model = Self.createSetGame()
@@ -29,20 +30,64 @@ class SetGameViewModel: ObservableObject {
     model.cardsOnBoard
   }
 
+  var cardsInDeck: [SetGame.Card] {
+    return model.deck
+  }
+
+  var discardedCards: [SetGame.Card] {
+    return model.discardedCards
+  }
+
+  var numberOfSets: Int {
+    return model.numberOfSetsOnBoard
+  }
+
+  static var minCardsOnBoard: Int {
+    SetGame.minCardsOnBoard
+  }
+  static var numberOfCardsToDeal = 3
+
   func newGameTaped(){
-    model = Self.createSetGame()
+    withAnimation{
+      model = Self.createSetGame()
+      withAnimation{
+        dealInitialCards()
+      }
+    }
   }
 
   func cardTaped(_ card: SetGame.Card){
     model.choose(card)
+
+    if model.hasSetSelected {
+      withAnimation(.default.delay(0.5)){
+        model.discardSet()
+      }
+    }
   }
 
   func shuffleTaped(){
     model.shuffleCards()
   }
 
-  func dealCardsTaped(){
-    model.dealMoreCards()
+  func dealInitialCards(){
+    var delay = 0.3
+    for _ in 0..<Self.minCardsOnBoard{
+      withAnimation(.default.delay(delay)){
+        model.dealCard()
+      }
+      delay += 0.17
+    }
+  }
+
+  func deckTaped(){
+    var delay = 0.0
+    for _ in 0..<Self.numberOfCardsToDeal{
+      withAnimation(.default.delay(delay)){
+        model.dealCard()
+      }
+      delay += 0.17
+    }
   }
 }
 

@@ -8,42 +8,91 @@
 import SwiftUI
 
 struct SetGameView: View {
+  typealias Card = SetGame.Card
+  @Namespace private var dealingNamespace
+
   @ObservedObject var viewModel: SetGameViewModel
   private let aspectRatio: CGFloat = 3/4
-
+  private let deckWidth: CGFloat = 80
+  static private let minItemCount = SetGameViewModel.minCardsOnBoard
 
   var body: some View {
     VStack{
-      Button("New Game"){
-        viewModel.newGameTaped()
-      }
-        .font(.largeTitle)
-      cards.animation(.default, value: viewModel.cardsOnBoard)
+      newGame
+      Text("Number of sets\n on Board: \(viewModel.numberOfSets)").font(.headline)
+      cards
         .padding()
       HStack{
-        Button("Deal Cards"){
-          viewModel.dealCardsTaped()
-        }
+        deck
         Spacer()
-        Button("Shuffle"){
-          viewModel.shuffleTaped()
-        }
+        shuffle
+        Spacer()
+        discardCards
       }
       .font(.largeTitle)
       .padding()
     }
   }
 
+  private var shuffle: some View{
+    Button("Shuffle"){
+      withAnimation(){
+        viewModel.shuffleTaped()
+      }
+    }
+  }
+
+  private var newGame: some View{
+    Button("New Game"){
+      viewModel.newGameTaped()
+    }
+    .font(.largeTitle)
+  }
+
+  private var deck: some View{
+    ZStack{
+      ForEach(viewModel.cardsInDeck){ card in
+        CardView(card: card)
+          .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+      }
+    }
+    .frame(width: deckWidth, height: deckWidth / aspectRatio)
+    .onAppear(){
+      viewModel.dealInitialCards()
+    }
+    .onTapGesture{
+      viewModel.deckTaped()
+    }
+
+  }
+
+  private var discardCards: some View{
+    ZStack{
+      ForEach(viewModel.discardedCards){ card in
+        CardView(card: card)
+          .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+          .transition(.scale)
+
+      }
+    }
+    .frame(width: deckWidth, height: deckWidth / aspectRatio)
+  }
+
   private var cards: some View {
-    AspectVGrid(viewModel.cardsOnBoard, aspectRatio: aspectRatio){
-      card in
+    AspectVGrid(viewModel.cardsOnBoard,
+                aspectRatio: aspectRatio,
+                minItemCount: SetGameView.minItemCount
+    ){ card in
       CardView(card: card)
+        .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+        .rotationEffect(.degrees(card.isInSet ? 360 : 0))
         .padding(4)
         .onTapGesture{
-          viewModel.cardTaped(card)
+          withAnimation{
+            viewModel.cardTaped(card)
+          }
         }
     }
-    .foregroundColor(Color.black)
   }
 }
 
@@ -54,6 +103,8 @@ struct CardView: View{
   }
 
   var body: some View{
+    let backCardColor = Color(red: 0.45, green: 0.20, blue: 0.8)
+
     GeometryReader{ geometry in
       ZStack{
         let base = RoundedRectangle(cornerRadius: 15)
@@ -73,6 +124,9 @@ struct CardView: View{
               )
           }
         }
+        .opacity(card.isFaceUp ? 1 : 0)
+        base.fill(backCardColor)
+          .opacity(card.isFaceUp ? 0 : 1)
       }
     }
   }
@@ -113,12 +167,12 @@ struct SetSymbolView: View{
 
   private var color: Color{
     switch card.color{
-      case .green:
+    case .green:
         .green
-      case .red:
+    case .red:
         .red
-      case .purple:
-        Color(red: 0.55, green: 0.20, blue: 0.60)
+    case .purple:
+      Color(red: 0.45, green: 0.20, blue: 0.8)
     }
   }
 
@@ -137,27 +191,27 @@ struct StripedShape<S: Shape>: View {
           .stroke(color, lineWidth: 2)
           .clipShape(shape)
       }
+  }
+}
+
+struct Stripes: Shape {
+  let spacing: CGFloat = 5
+
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+
+    var x = rect.minX
+
+    while x <= rect.maxX {
+      path.move(to: CGPoint(x: x, y: rect.minY))
+      path.addLine(to: CGPoint(x: x, y: rect.maxY))
+
+      x += spacing
     }
+
+    return path
   }
-
-  struct Stripes: Shape {
-      let spacing: CGFloat = 5
-
-      func path(in rect: CGRect) -> Path {
-          var path = Path()
-
-          var x = rect.minX
-
-          while x <= rect.maxX {
-              path.move(to: CGPoint(x: x, y: rect.minY))
-              path.addLine(to: CGPoint(x: x, y: rect.maxY))
-
-              x += spacing
-          }
-
-          return path
-      }
-  }
+}
 
 
 
