@@ -72,16 +72,26 @@ class SetGameViewModel: ObservableObject {
 
   }
 
-  func shuffleTaped(){
+  func shuffleTaped() {
     model.shuffleCards()
   }
 
-  func dealInitialCards(){
+  func dealInitialCards() {
     dealCards(numberOfCardsToDeal: 9, withDelay: 0.3)
   }
 
-  func deckTaped(){
+  func deckTaped() {
     dealCards(numberOfCardsToDeal: 3)
+  }
+
+  func findSetTaped() {
+    model.findSet()
+    withAnimation(.default.delay(0.5)) {
+      model.discardSet()
+    }
+    while model.numberOfSetsOnBoard == 0 {
+      dealCards(numberOfCardsToDeal: 3, withDelay: 0.5)
+    }
   }
 
   private func dealCards(

@@ -115,6 +115,21 @@ struct SetGame{
     }
   }
 
+  mutating func findSet(){
+    for first in 0..<cardsOnBoard.count {
+      for second in (first + 1)..<cardsOnBoard.count {
+        for third in (second + 1)..<cardsOnBoard.count {
+          if isSet(cardsAt: [first, second, third]) {
+            cardsOnBoard[first].isSelected = true
+            cardsOnBoard[second].isSelected = true
+            cardsOnBoard[third].isSelected = true
+            return
+          }
+        }
+      }
+    }
+  }
+
   private func isSet(cardsAt indices: [Int]) -> Bool {
     guard indices.count == 3 else {
       return false

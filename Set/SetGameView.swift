@@ -25,7 +25,12 @@ struct SetGameView: View {
       HStack{
         deck
         Spacer()
-        shuffle
+        VStack{
+          shuffle
+          Button("Find Set"){
+            viewModel.findSetTaped()
+          }
+        }
         Spacer()
         discardCards
       }
