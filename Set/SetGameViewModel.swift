@@ -63,7 +63,13 @@ class SetGameViewModel: ObservableObject {
       withAnimation(.default.delay(0.5)){
         model.discardSet()
       }
+      while model.numberOfSetsOnBoard == 0 {
+        withAnimation {
+          dealCards(numberOfCardsToDeal: 3, withDelay: 0.5)
+        }
+      }
     }
+
   }
 
   func shuffleTaped(){
@@ -71,23 +77,31 @@ class SetGameViewModel: ObservableObject {
   }
 
   func dealInitialCards(){
-    var delay = 0.3
-    for _ in 0..<Self.minCardsOnBoard{
-      withAnimation(.default.delay(delay)){
-        model.dealCard()
-      }
-      delay += 0.17
-    }
+    dealCards(numberOfCardsToDeal: 9, withDelay: 0.3)
   }
 
   func deckTaped(){
-    var delay = 0.0
-    for _ in 0..<Self.numberOfCardsToDeal{
-      withAnimation(.default.delay(delay)){
-        model.dealCard()
+    dealCards(numberOfCardsToDeal: 3)
+  }
+
+  private func dealCards(
+    numberOfCardsToDeal: Int,
+    withDelay delay: Double = 0.0) {
+      var delay = delay
+      for _ in 0..<numberOfCardsToDeal {
+        withAnimation(.default.delay(delay)) {
+          model.dealCard()
+        }
+        delay += 0.17
       }
-      delay += 0.17
-    }
+      while model.numberOfSetsOnBoard == 0 {
+        for _ in 0..<3 {
+          withAnimation(.default.delay(delay)) {
+            model.dealCard()
+          }
+          delay += 0.17
+        }
+      }
   }
 }
 

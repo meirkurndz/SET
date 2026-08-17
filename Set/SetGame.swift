@@ -84,7 +84,6 @@ struct SetGame{
       for index in indices{
         cardsOnBoard[index].isInSet.toggle()
       }
-      //discardSet(cardsAt: indices)
     }
   }
 
